@@ -1,5 +1,19 @@
 # Aktionsprotokoll
 
+## Datenbankintegration – Schritt 2: PGlite
+
+- Nutzerpräferenz: immer PGlite primär, SQLite ausschließlich als Fallback.
+- `npm install --prefix src-electron @electric-sql/pglite` mit Freigabe ausgeführt.
+  Die Abhängigkeit ist bereits im ersten Commit `770dadf` enthalten.
+- PGlite-Adapter mit Drizzle, dauerhafter Speicherung, deaktivierter gelockerter
+  Durabilität, Notizen-Beispiel und idempotentem asynchronem `close()` ergänzt.
+- Lokale Typen und Drizzle-Migratoren mittels `rg`/`Get-Content` geprüft.
+- Erster Commit-Versuch durch Git-Index-Sandbox blockiert; mit Freigabe erfolgreich.
+  Tatsächlicher Titel: `Add Drizzle tooling, schemas and PGlite dependencies`.
+- `npm install --prefix src-electron better-sqlite3` für folgenden SQLite-Schritt.
+- Zwischencommit: `git add src-electron/database/contracts.ts src-electron/database/pglite.ts AKTIONEN.md`
+  und `git commit -m "Add persistent PGlite adapter with graceful close"`.
+
 ## Datenbankintegration – Schritt 1: Drizzle
 
 - Git-Arbeitsverzeichnis mit `git status --short` geprüft: sauber.
