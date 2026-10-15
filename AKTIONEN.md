@@ -1,5 +1,13 @@
 # Aktionsprotokoll
 
+## Datenbankintegration – Schritt 3: SQLite-Fallback
+
+- `better-sqlite3` als Electron-Laufzeitabhängigkeit installiert.
+- Drizzle-Adapter mit WAL, `synchronous=FULL`, getrenntem Schema, denselben
+  Notizoperationen und explizitem Schließen erstellt.
+- Commit: `git add src-electron/database/sqlite.ts src-electron/package.json src-electron/package-lock.json AKTIONEN.md`
+  und `git commit -m "Add SQLite Drizzle fallback adapter"`.
+
 ## Datenbankintegration – Schritt 2: PGlite
 
 - Nutzerpräferenz: immer PGlite primär, SQLite ausschließlich als Fallback.

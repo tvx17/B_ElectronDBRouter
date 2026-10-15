@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.10",
+    "better-sqlite3": "^13.0.3",
     "drizzle-orm": "^0.45.4"
   }
 }
