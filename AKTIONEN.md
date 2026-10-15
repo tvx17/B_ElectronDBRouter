@@ -1,5 +1,51 @@
 # Aktionsprotokoll
 
+### Ergänzende Prüfung des Datenbank-Lebenszyklus
+
+- Fünf Integrationstests erfolgreich: beide echten Datenbanken inklusive
+  Wiederöffnung, Fallback, Migrationsfehler und sofortiger Shutdown.
+- Shutdown-Handler als `src-electron/database/shutdown.ts` ausgelagert, damit
+  derselbe Handler im echten Electron-Main-Prozess getestet werden kann.
+- `npm run test:database:electron` startet unsichtbare Testprozesse mit isolierten
+  Profilen: beide melden erfolgreiches Warten auf Start/Migration/Schreiben und
+  Wiederöffnung. Testskripte liegen unter `tests/`.
+- Vorherige Testversuche korrigiert: Electron muss über `require("electron")`
+  statt über den Paketpfad importiert werden; im CJS-Test werden die Adapter
+  explizit injiziert, da dessen TS-Lader dynamische TS-Imports nicht auflöst.
+- Hängenden ersten Test über `Get-CimInstance Win32_Process` identifiziert,
+  vollständige Befehlszeile und Workspace-Pfad geprüft und ausschließlich
+  Test-PID 30176 mit `Stop-Process -Id 30176 -Force` beendet (mit Freigabe).
+- Testbefehle: `node src-electron/node_modules/electron/cli.js tests/electron-database-smoke.cjs pglite`
+  bzw. `sqlite`; reproduzierbarer finaler Aufruf ist `npm run test:database:electron`.
+- `npx quasar build -m electron --skip-pkg *> electron-database-build.log`
+  erfolgreich. `Get-Content electron-database-build.log -Tail 20` geprüft.
+- `npx oxfmt` für neue Datenbankdateien, Tests, Konfigurationen,
+  Migrationsmetadaten und Paketdateien ausgeführt. Bekannte Formatabweichungen
+  in `src-electron/package.json` und `src-pwa/package.json` korrigiert.
+  Lint-Hinweis zum unnötigen Spread bei `Promise.allSettled` korrigiert.
+- Abschließend `npm run lint:check` und `npm run typecheck` erneut ausgeführt.
+
+## Datenbankintegration – Schritt 4: Eingebundene Migrationen und Lebenszyklus
+
+- Migrationen über `npx drizzle-kit generate --config drizzle.pglite.config.ts`
+  und `npx drizzle-kit generate --config drizzle.sqlite.config.ts` erzeugt.
+  Nach EPERM mit Freigabe wiederholt. SQL, Journale und Snapshots liegen in
+  `src-electron/electron-assets/migrations/` und werden von Quasar mitkopiert.
+- `db:generate:pglite`, `db:generate:sqlite` und `test:database` als npm-Skripte
+  ergänzt. Keine Schemaänderungen über `push` beim Anwendungsstart.
+- Datenbankmanager mit PGlite als Primärsystem, SQLite nur bei Öffnungsfehler,
+  sichtbarer Warnung und getrennten Datenbeständen ergänzt. Migrationsfehler
+  brechen den Start ab; sie aktivieren keinen Fallback.
+- Electron startet erst nach Migrationen. Single-Instance-Lock schützt den
+  Datenordner. `before-quit`, SIGINT/SIGTERM und Windows `query-session-end`
+  stoßen asynchrones Schließen an; neue Anfragen werden abgelehnt und laufende
+  Operationen inklusive noch laufendem Start abgewartet.
+- API um `GET /database`, `GET /notes` und `POST /notes` ergänzt.
+- `npm run typecheck` erfolgreich (bekannter rootDir-Hinweis bleibt).
+- `npm run test:database` zunächst EPERM; mit Freigabe erneut gestartet.
+- Commit: `git add package.json drizzle.pglite.config.ts drizzle.sqlite.config.ts src-electron/electron-assets/migrations src-electron/database/manager.ts src-electron/electron-main.ts src-electron/api-router.ts tests/database.test.ts AKTIONEN.md`
+  und `git commit -m "Embed Drizzle migrations and manage database startup and shutdown"`.
+
 ## Datenbankintegration – Schritt 3: SQLite-Fallback
 
 - `better-sqlite3` als Electron-Laufzeitabhängigkeit installiert.

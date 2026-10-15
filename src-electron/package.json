@@ -1,16 +1,16 @@
 {
   "name": "quasar-electron-app",
   "version": "1.0.0",
-  "description": "Quasar Electron Folder",
   "private": true,
+  "description": "Quasar Electron Folder",
   "type": "module",
-  "devDependencies": {
-    "@electron/packager": "^20.3.0",
-    "electron": "^44.7.2"
-  },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.10",
     "better-sqlite3": "^13.0.3",
     "drizzle-orm": "^0.45.4"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.7.2"
   }
 }

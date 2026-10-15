@@ -18,7 +18,8 @@ export function connectSqlite(filename: string) {
   const db = drizzle(client);
   const database: Database = {
     provider: "sqlite",
-    listNotes: () => Promise.resolve(db.select().from(notes).orderBy(notes.id).all()),
+    listNotes: () =>
+      Promise.resolve(db.select().from(notes).orderBy(notes.id).all()),
     async addNote(title) {
       const note = { id: randomUUID(), title };
       db.insert(notes).values(note).run();

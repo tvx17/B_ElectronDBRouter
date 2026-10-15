@@ -3,6 +3,7 @@ import type {
   ApiResponse,
   JsonValue
 } from "../src/shared/electron-api";
+import type { DatabaseManager } from "./database/manager";
 
 function isJson(value: unknown): value is JsonValue {
   if (
@@ -22,7 +23,10 @@ function isJson(value: unknown): value is JsonValue {
 }
 
 // Validierung bleibt im Main-Prozess: Renderer-Eingaben sind nicht vertrauenswürdig.
-export async function routeRequest(input: unknown): Promise<ApiResponse> {
+export async function routeRequest(
+  input: unknown,
+  database?: DatabaseManager
+): Promise<ApiResponse> {
   try {
     if (!input || typeof input !== "object") {
       return { status: 400, data: { error: "Ungültige Anfrage." } };
@@ -54,6 +58,44 @@ export async function routeRequest(input: unknown): Promise<ApiResponse> {
 
     // Hier eigene Ressourcen und Methoden ergänzen. Kein HTTP-Server notwendig.
     switch (resource) {
+      case "database":
+        if (method !== "GET" || id)
+          return { status: 405, data: { error: "Nur GET /database erlaubt." } };
+        return database
+          ? { status: 200, data: database.status() }
+          : { status: 503, data: { error: "Datenbank nicht verfügbar." } };
+      case "notes": {
+        if (!database)
+          return { status: 503, data: { error: "Datenbank nicht verfügbar." } };
+        if (id)
+          return { status: 404, data: { error: "Route nicht gefunden." } };
+        if (method === "GET")
+          return {
+            status: 200,
+            data: {
+              items: (await database.listNotes()).map(note => ({ ...note }))
+            }
+          };
+        if (method !== "POST")
+          return { status: 405, data: { error: "Nur GET und POST erlaubt." } };
+        if (
+          !data ||
+          typeof data !== "object" ||
+          Array.isArray(data) ||
+          typeof data.title !== "string" ||
+          !data.title.trim() ||
+          data.title.length > 1000
+        ) {
+          return {
+            status: 400,
+            data: { error: "title muss 1 bis 1000 Zeichen enthalten." }
+          };
+        }
+        return {
+          status: 201,
+          data: { ...(await database.addNote(data.title.trim())) }
+        };
+      }
       case "users":
         switch (method) {
           case "GET":
@@ -101,7 +143,11 @@ export async function routeRequest(input: unknown): Promise<ApiResponse> {
         }
     }
     return { status: 404, data: { error: "Route nicht gefunden." } };
-  } catch {
+  } catch (error) {
+    if (!(error instanceof URIError) && !(error instanceof TypeError)) {
+      console.error("API-Verarbeitung fehlgeschlagen:", error);
+      return { status: 500, data: { error: "Interner Verarbeitungsfehler." } };
+    }
     return {
       status: 400,
       data: { error: "Anfrage konnte nicht verarbeitet werden." }
