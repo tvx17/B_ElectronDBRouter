@@ -5,6 +5,12 @@
 Beispiele und Erweiterung des IPC-Routers: [Electron API](docs/electron-api.md).
 Start: `npm run dev -- -m electron`, anschließend in der App `#/api` öffnen.
 
+## Electron-Datenbanken
+
+[PGlite, SQLite-Fallback und Drizzle-Migrationen](docs/database.md):
+PGlite als primäre Datenbank, SQLite nur bei Öffnungsfehlern, eingebundene
+Migrationen und geordnetes Beenden. Die API-Beispielseite enthält persistente Notizen.
+
 ## Install the dependencies
 
 ```bash

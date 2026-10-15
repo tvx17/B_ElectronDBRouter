@@ -1,5 +1,38 @@
 # Aktionsprotokoll
 
+## Datenbankintegration – Schritt 5: Beispiele, Anleitung und Paketierung
+
+- `docs/database.md` mit Installation, Speicherorten, Fallback-Regeln,
+  Migrationsablauf, API-Beispielen, Tests und Grenzen des Shutdowns erstellt.
+  README und API-Anleitung verlinkt. Beispielseite `#/api` um Datenbankstatus
+  sowie Speichern/Laden persistenter Notizen ergänzt.
+- `electron-database-build.log` in `.gitignore` aufgenommen.
+- `npx oxfmt src/pages/index/api.vue docs/database.md docs/electron-api.md README.md`
+  ausgeführt. Danach `npm run lint:check`, `npm run typecheck` und
+  `node --experimental-strip-types --test tests/electron-api.test.mjs`
+  erfolgreich (drei API-Tests). Typprüfung mit bekanntem rootDir-Hinweis.
+- `npm run build -- -m electron *> electron-database-build.log` zur vollständigen
+  Paketierung gestartet. Paketmanifest mit `Get-Content dist/electron/UnPackaged/package.json`
+  geprüft: PGlite, SQLite-Treiber und Drizzle als Laufzeitabhängigkeiten enthalten.
+  Buildfortschritt mit `Get-Content electron-database-build.log -Tail 30` und
+  Paketdateien über `rg --files dist/electron` geprüft.
+- `npm run build *> .quasar/database-spa-build.log` für den Web-Build gestartet.
+  Generierte Ausgaben bleiben außerhalb der Versionsverwaltung.
+- Änderungen mit `git status --short` geprüft. Abschließender Commit vorgesehen:
+  `git add .gitignore README.md docs/database.md docs/electron-api.md src/pages/index/api.vue AKTIONEN.md`
+  und `git commit -m "Document Electron databases and add persistent API examples"`.
+- Vollständige Windows-x64-Paketierung und Web-Build erfolgreich abgeschlossen.
+  Ausgabe: `dist/electron/Packaged/Boilerplate-win32-x64/`.
+- Mit `rg --files --no-ignore dist/electron/Packaged -g '*.node'` native
+  SQLite-Dateien im entpackten ASAR-Bereich geprüft. Archivinhalt mit
+  `node src-electron/node_modules/@electron/asar/bin/asar.mjs list dist/electron/Packaged/Boilerplate-win32-x64/resources/app.asar`
+  und `Select-String 'migrations|pglite.wasm|pglite.data|better-sqlite3.prebuilds.win32-x64'`
+  kontrolliert: beide Migrationsreihen, PGlite-WASM/Datendatei und Windows-Treiber
+  sind enthalten. `git diff --check` erfolgreich; `git log -4 --oneline` geprüft.
+- Kein Installer erzeugt und keine produktiven Benutzerdaten verändert.
+  Automatisierte Electron-Tests liefen ohne Fenster; die Beispielseite wurde
+  kompiliert, aber nicht interaktiv angeklickt.
+
 ### Ergänzende Prüfung des Datenbank-Lebenszyklus
 
 - Fünf Integrationstests erfolgreich: beide echten Datenbanken inklusive

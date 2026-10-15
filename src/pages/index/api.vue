@@ -1,7 +1,11 @@
 <template>
   <q-page padding>
     <h1 class="text-h5">Electron API Beispiele</h1>
-    <p>Die Beispieldaten werden nicht gespeichert.</p>
+    <p>
+      Notizen werden lokal gespeichert. Die Nutzer-Beispiele bleiben ohne
+      Speicherung. PGlite ist Standard; SQLite dient ausschließlich als
+      Fallback.
+    </p>
     <p v-if="!available">Bitte mit npm run dev -- -m electron starten.</p>
     <div class="row q-gutter-sm">
       <q-btn
@@ -25,6 +29,16 @@ import type { ApiRequest } from "@/shared/electron-api";
 const available = Boolean(window.electronApi);
 const result = ref("Eine Anfrage auswählen.");
 const examples: { label: string; request: ApiRequest }[] = [
+  { label: "Datenbankstatus", request: { method: "GET", url: "/database" } },
+  { label: "Notizen laden", request: { method: "GET", url: "/notes" } },
+  {
+    label: "Notiz speichern",
+    request: {
+      method: "POST",
+      url: "/notes",
+      data: { title: "Meine erste Notiz" }
+    }
+  },
   {
     label: "GET Liste",
     request: { method: "GET", url: "/users?search=Max%20Mustermann" }

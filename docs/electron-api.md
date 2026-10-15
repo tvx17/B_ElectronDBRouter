@@ -2,7 +2,8 @@
 
 Start: `npm run dev -- -m electron`. In der Anwendung die Hash-Route
 `#/api` öffnen. Sie enthält ausführbare GET-, POST-, PUT-, PATCH-, DELETE-
-und Fehlerbeispiele. Alternativ im Frontend:
+und Fehlerbeispiele sowie persistente Notizen mit Drizzle. Details zu PGlite,
+SQLite-Fallback und Migrationen: [Datenbanken](database.md). Alternativ im Frontend:
 
 ```typescript
 import { request } from "@/services/electron-api";
