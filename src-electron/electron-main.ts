@@ -1,4 +1,5 @@
-import { BrowserWindow, app } from "electron";
+import { BrowserWindow, app, ipcMain } from "electron";
+import { routeRequest } from "./api-router";
 import path from "node:path";
 import os from "node:os";
 import {
@@ -20,10 +21,14 @@ async function createWindow() {
     useContentSize: true,
     webPreferences: {
       contextIsolation: true,
+      nodeIntegration: false,
       // https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.join(import.meta.dirname, "electron-preload.cjs")
     }
   });
+
+  mainWindow.webContents.on("will-navigate", event => event.preventDefault());
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
 
   if (import.meta.env.QUASAR_DEV) {
     await mainWindow.loadURL(import.meta.env.QUASAR_APP_URL);
@@ -44,6 +49,13 @@ async function createWindow() {
 
 void app.whenReady().then(() => {
   registerQuasarRuntime();
+  ipcMain.handle("api:request", (event, request: unknown) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window || event.senderFrame !== window.webContents.mainFrame) {
+      return { status: 403, data: { error: "Zugriff verweigert." } };
+    }
+    return routeRequest(request);
+  });
   void createWindow();
 
   app.on("activate", () => {

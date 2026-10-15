@@ -1,5 +1,10 @@
 # Boilerplate (electronrouterdbm)
 
+## Electron API
+
+Beispiele und Erweiterung des IPC-Routers: [Electron API](docs/electron-api.md).
+Start: `npm run dev -- -m electron`, anschließend in der App `#/api` öffnen.
+
 ## Install the dependencies
 
 ```bash
