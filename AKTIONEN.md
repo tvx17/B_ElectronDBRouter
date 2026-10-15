@@ -1,5 +1,24 @@
 # Aktionsprotokoll
 
+## Datenbankintegration – Schritt 1: Drizzle
+
+- Git-Arbeitsverzeichnis mit `git status --short` geprüft: sauber.
+- Electron-Konfiguration, Main-Prozess, Router, Paketdateien und generierte
+  TypeScript-Konfiguration gelesen. Quasar-Quellcode per `rg` auf Behandlung
+  externer Electron-Abhängigkeiten geprüft; Historie mit `git log -4 --oneline`.
+- Offizielle Dokumentation abgerufen: https://orm.drizzle.team/docs/get-started/pglite-new,
+  https://orm.drizzle.team/docs/get-started/sqlite-new,
+  https://orm.drizzle.team/docs/migrations, https://pglite.dev/docs/api,
+  https://pglite.dev/docs/filesystems und https://www.electronjs.org/docs/latest/api/app.
+  https://orm.drizzle.team/docs/connect-sqlite war nicht erreichbar.
+- npm-Installation zunächst durch Offline-Sandbox blockiert (ENOTCACHED).
+  Mit Freigabe: `npm install --save-dev drizzle-kit tsx @types/better-sqlite3`,
+  `npm install drizzle-orm`, `npm install --prefix src-electron drizzle-orm`.
+- Getrennte PostgreSQL-/SQLite-Schemas und Drizzle-Kit-Konfigurationen angelegt.
+  Beispielressource: `notes` mit Text-ID und Titel.
+- Commit: `git add package.json package-lock.json src-electron/package.json src-electron/package-lock.json src-electron/database/schema-pg.ts src-electron/database/schema-sqlite.ts drizzle.pglite.config.ts drizzle.sqlite.config.ts AKTIONEN.md`
+  und `git commit -m "Add Drizzle ORM and dialect-specific migration configuration"`.
+
 ## 15. Oktober 2026 – Repository-Leitfaden
 
 - Mit `Test-Path -LiteralPath AGENTS.md` geprüft, dass die Datei nicht existierte.
